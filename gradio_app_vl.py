@@ -25,8 +25,8 @@ from openai import OpenAI
 from pdf2image import convert_from_path
 from PIL import Image
 
-# 获取项目根目录
-project_root = str(Path(__file__).resolve().parent.parent)
+# 获取项目根目录（当前文件所在目录）
+project_root = str(Path(__file__).resolve().parent)
 if project_root not in sys.path:
     sys.path.append(project_root)
 
@@ -34,8 +34,8 @@ if project_root not in sys.path:
 from extractors.pdf_extractor import PDFProcessor
 
 # ========== 1. 基础配置与路径 ==========
-OS_TEMP_DIR = "/home/yangqi/workspace/DocumentExtractor/tmp"
-LOCAL_TMP = "/home/yangqi/workspace/DocumentExtractor/tmp"
+OS_TEMP_DIR = os.path.join(project_root, "tmp")
+LOCAL_TMP = OS_TEMP_DIR
 os.makedirs(LOCAL_TMP, exist_ok=True)
 
 os.environ["TMPDIR"] = LOCAL_TMP
@@ -44,7 +44,7 @@ os.system(f"chmod -R 777 {LOCAL_TMP}")
 
 VLLM_API_URL = "http://127.0.0.1:38000/v1"
 VLLM_MODEL_NAME = "Qwen3-VL-4B-Instruct"
-EXCEL_PATH = "/home/yangqi/workspace/DocumentExtractor/data/port_map.xlsx"
+EXCEL_PATH = os.path.join(project_root, "data", "port_map.xlsx")
 
 os.makedirs(OS_TEMP_DIR, exist_ok=True)
 
@@ -1281,7 +1281,7 @@ def process_file(file_path: str, doc_type: str) -> Tuple[str, str]:
             final_res = json.dumps({"error": f"暂不支持 {ext} 格式文件"}, ensure_ascii=False)
         
         # 结果持久化
-        output_dir = "/home/yangqi/workspace/DocumentExtractor/output/gradio"
+        output_dir = os.path.join(project_root, "output", "gradio")
         os.makedirs(output_dir, exist_ok=True)
         output_file = os.path.join(output_dir, f"res_{Path(file_path).stem}.json")
         
@@ -1385,5 +1385,5 @@ if __name__ == "__main__":
         server_name="0.0.0.0",
         server_port=7860,
         share=False,
-        allowed_paths=["/home/yangqi/workspace/DocumentExtractor/", LOCAL_TMP]
+        allowed_paths=[project_root, LOCAL_TMP]
     )
